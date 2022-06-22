@@ -37,7 +37,7 @@ class APIFeautres {
   }
 
   limitFields() {
-    //FIELD LIMITING
+    //FIELD LIMITING OR PROJECTION
     if (this.queryString.fields) {
       console.log(this.queryString.fields);
       const fields = this.queryString.fields.split(',').join(' ');
