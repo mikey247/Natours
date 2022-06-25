@@ -21,6 +21,7 @@
     "axobject-query": "^2.2.0",
     "balanced-match": "^1.0.2",
     "basic-auth": "^2.0.1",
+    "bcryptjs": "^2.4.3",
     "bl": "^2.2.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.20.0",
@@ -138,6 +139,7 @@
     "json-schema-traverse": "^0.4.1",
     "json-stable-stringify-without-jsonify": "^1.0.1",
     "json5": "^1.0.1",
+    "jsonwebtoken": "^8.5.1",
     "jsx-ast-utils": "^3.3.0",
     "kareem": "^2.3.2",
     "language-subtag-registry": "^0.3.21",
@@ -219,6 +221,7 @@
     "side-channel": "^1.0.4",
     "sift": "^13.5.2",
     "sliced": "^1.0.1",
+    "slugify": "^1.6.5",
     "sparse-bitfield": "^3.0.3",
     "statuses": "^2.0.1",
     "string_decoder": "^1.1.1",
@@ -242,6 +245,7 @@
     "util-deprecate": "^1.0.2",
     "utils-merge": "^1.0.1",
     "v8-compile-cache": "^2.3.0",
+    "validator": "^13.7.0",
     "vary": "^1.1.2",
     "which": "^2.0.2",
     "which-boxed-primitive": "^1.0.2",
@@ -250,7 +254,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "start:prod": "SET NODE_ENV=production&& nodemon server.js",
+    "debug": "ndb server.js"
   },
   "author": "",
   "license": "ISC"
