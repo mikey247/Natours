@@ -82,6 +82,8 @@
     "esutils": "^2.0.3",
     "etag": "^1.8.1",
     "express": "^4.18.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.4.0",
     "fast-deep-equal": "^3.1.3",
     "fast-diff": "^1.2.0",
     "fast-json-stable-stringify": "^2.1.0",
@@ -109,6 +111,8 @@
     "has-property-descriptors": "^1.0.0",
     "has-symbols": "^1.0.3",
     "has-tostringtag": "^1.0.0",
+    "helmet": "^5.1.0",
+    "hpp": "^0.2.3",
     "http-errors": "^2.0.0",
     "iconv-lite": "^0.4.24",
     "ignore": "^5.2.0",
@@ -251,7 +255,8 @@
     "which": "^2.0.2",
     "which-boxed-primitive": "^1.0.2",
     "word-wrap": "^1.2.3",
-    "wrappy": "^1.0.2"
+    "wrappy": "^1.0.2",
+    "xss-clean": "^0.1.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

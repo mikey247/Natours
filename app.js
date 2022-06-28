@@ -1,5 +1,10 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp'); //HTTP parameter pollution
 
 const tourRouter = require('./routes/tour-routes');
 const userRouter = require('./routes/user-routes');
@@ -9,11 +14,47 @@ const globalErrorHandler = require('./controllers/error-controller');
 const app = express();
 
 // 1) MIDDLEWARES
+
+//SECURITY HTTP MIDDLEWARE
+app.use(helmet());
+
+//LOGGER
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-app.use(express.json());
+//RATE LIMITER--limits the amount of requests that can be set by a particular IP address
+const limiter = rateLimit({
+  max: 100, //amount of requests allowed
+  windowMs: 60 * 60 * 100, //Time for the requests -----100 requests/hour
+  message: 'Too many requests from this IP, please try again in one hour',
+});
+app.use('/api', limiter); //   /api so it affects all routes under
+
+//body parser----so we are able to read/use the request body-----------we limit the data size that can be received to 10 kilobytes
+app.use(express.json({ limit: '10kb' }));
+
+//DATA SANITIZATION AGAINST NOSQSL INJECTIONS
+app.use(mongoSanitize());
+
+//DATA SANITIZATION AGAINST XSS(CROSS SITE SCRIPTING ATTACKS)
+app.use(xss());
+
+//HTTP PARAMETER POLLUTION
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ], ///we whitelist parameters that can have multiple fields
+  })
+);
+
+//static files
 app.use(express.static(`${__dirname}/public`));
 
 // app.use((req, res, next) => {

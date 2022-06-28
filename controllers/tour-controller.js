@@ -90,7 +90,7 @@ exports.updateTour = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
-  if (!tour) {
+  if (!updatedTour) {
     return next(new AppError('No tour found with that ID', 404));
   }
 

@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetTokenExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 userSchema.pre('save', async function (next) {
@@ -67,6 +72,12 @@ userSchema.pre('save', function (next) {
   next();
 });
 
+//Query Middleware
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
@@ -81,7 +92,13 @@ userSchema.methods.userHasChangedPassword = function (JWTTimestamp) {
       this.passwordChangedAt.getTime() / 1000,
       10
     );
-    console.log(changedPasswordTimestamp, '....', JWTTimestamp);
+    console.log(
+      'changed password timesatamp-----',
+      changedPasswordTimestamp,
+      '....',
+      'JWT timestamp----',
+      JWTTimestamp
+    );
     return JWTTimestamp < changedPasswordTimestamp; // if jwt timestamp is less than changedPasswordTimeStamp then it is expired
   }
 

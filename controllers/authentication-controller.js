@@ -16,6 +16,23 @@ const getToken = (id) => {
 const createSendToken = (user, statusCode, res) => {
   const token = getToken(user._id);
 
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 100 ///converting the expiry time to milliseconds---24 hours in a day, 60 minutes in an hour ,60 seconds in a minute, 1000 milliseconds in a second
+    ),
+    // secure: true, /// can only be sent with https(encrypted connection)
+    httpOnly: true, //this makes it possible so that the the cookie cannot be accessed or modified by the browser in any way-----can only receive the cookie , store it and send it with every request.
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    cookieOptions.secure = true;
+  }
+
+  res.cookie('jwt', token, cookieOptions);
+
+  //Removes password from output
+  user.password = undefined;
+
   res.status(statusCode).json({
     status: 'success',
     token,
@@ -134,7 +151,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false }); //we need to pass in this option of validateBeforeSave: false because the createPasswordResetToken method in the schema tries to re-save/PUT the document when we assign values to this.passwordResetToken and this.passwordResetTokenExpires this throws an error beacause we don't provide the other fields of the document.
 
-  //3) Send it back to user's email
+  //3) Send it to user's email
   const resetURL = `${req.protocol}://${req.get(
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
