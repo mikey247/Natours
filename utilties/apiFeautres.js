@@ -31,7 +31,7 @@ class APIFeautres {
       this.query = this.query.sort(sortBy);
     } else {
       //DEFAULT SORTING
-      this.query = this.query.sort('createdAt');
+      this.query = this.query.sort('-createdAt');
     }
     return this;
   }

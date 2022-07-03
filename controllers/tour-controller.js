@@ -1,15 +1,8 @@
-const express = require('express');
-const fs = require('fs');
-const app = express();
 const Tour = require('../models/tourSchema');
 const APIFeautres = require('../utilties/apiFeautres');
 const AppError = require('../utilties/appError');
 const catchAsync = require('../utilties/catchAsync');
-
-// const tours = JSON.parse(fs.readFileSync('./dev-data/data/tours-simple.json'));
-// app.get('/', (req, res) => {
-//   res.status(200).json('hello from the server');
-// });
+const factory = require('../controllers/handlerFactory');
 
 //TOURS CALLBACKS
 exports.aliasTopTours = (req, res, next) => {
@@ -22,99 +15,79 @@ exports.aliasTopTours = (req, res, next) => {
 
 // READ ALL
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  const feautres = new APIFeautres(Tour, req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  // console.log(feautres);
-  const tours = await feautres.query;
+exports.getAllTours = factory.getAll(Tour);
+// exports.getAllTours = catchAsync(async (req, res, next) => {
+//   const feautres = new APIFeautres(Tour, req.query)
+//     .filter()
+//     .sort()
+//     .limitFields()
+//     .paginate();
+//   // console.log(feautres.query, '....---');
+//   const tours = await feautres.query;
 
-  res.status(200).json({
-    status: 'success',
-    reults: tours.length,
-    // requestTime: req.requestTime,
-    data: {
-      tours,
-    },
-  });
-  //
-});
+//   res.status(200).json({
+//     status: 'success',
+//     reults: tours.length,
+//     // requestTime: req.requestTime,
+//     data: {
+//       tours,
+//     },
+//   });
+//   //
+// });
 
 //READ ONE
-exports.getSingleTour = catchAsync(async (req, res, next) => {
-  // console.log(req.params);
-  const id = req.params.id * 1;
 
-  const tour = await Tour.findById(req.params.id);
+exports.getSingleTour = factory.getOne(Tour, { path: 'reviews' });
 
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
+// exports.getSingleTour = catchAsync(async (req, res, next) => {
+// console.log(req.params);
 
-  res.status(200).json({
-    staus: 'success',
-    data: {
-      tour,
-    },
-  });
+//   const tour = await Tour.findById(req.params.id).populate('reviews'); // here we use the populate to make use of the VIRTUAL POPULATE function in the tourschema that connects the tour schema to the Reviews schema
 
-  // const tour = tours.find((i) => i.id === id);
-  // res.status(200).json({
-  //   status: 'success',
-  //   // reults: tour.length,
-  //   data: {
-  //     tour,
-  //   },
-  // });
-});
+//   if (!tour) {
+//     return next(new AppError('No tour found with that ID', 404));
+//   }
+
+//   res.status(200).json({
+//     staus: 'success',
+//     data: {
+//       tour,
+//     },
+//   });
+
+//   // const tour = tours.find((i) => i.id === id);
+//   // res.status(200).json({
+//   //   status: 'success',
+//   //   // reults: tour.length,
+//   //   data: {
+//   //     tour,
+//   //   },
+//   // });
+// });
 
 //CREATE
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour,
-    },
-  });
-});
+exports.createTour = factory.createOne(Tour);
 
 //UPDATE
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!updatedTour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: updatedTour,
-    },
-  });
-});
+exports.updateTour = factory.updateOne(Tour);
 
 //DELETE
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const data = await Tour.findByIdAndDelete(req.params.id);
+exports.deleteTour = factory.deleteOne(Tour);
 
-  if (!data) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
+// exports.deleteTour = catchAsync(async (req, res, next) => {
+//   const data = await Tour.findByIdAndDelete(req.params.id);
 
-  res.status(204).json({
-    status: 'deleted',
-    data: data,
-  });
-});
+//   if (!data) {
+//     return next(new AppError('No tour found with that ID', 404));
+//   }
+
+//   res.status(204).json({
+//     status: 'deleted',
+//     data: data,
+//   });
+// });
 
 //AGGREGATION PIPELINE
 // these are like a pipeline which certain documents from a collection have to go through to be processed in stages with the end result being 'aggregated data'
@@ -172,7 +145,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 
   const plan = await Tour.aggregate([
     {
-      $unwind: '$startDates',
+      $unwind: '$startDates', /// create an array of objects containing each date in the startDates array of all the documents along with which tour is starting that day.... 3 start dates for each of the 9 documents which means 27 items in the array
     },
 
     //
@@ -189,19 +162,19 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 
     {
       $group: {
-        _id: { $month: '$startDates' },
-        numberOfTourStarts: { $sum: 1 },
+        _id: { $month: '$startDates' }, //extracts the month from each date and groups by month and shows what month it is --- 6=june,1=january,12=december
+        numberOfTourStarts: { $sum: 1 }, // for each tour starting in that month add 1
         tours: { $push: '$name' },
       },
     },
     //\
     {
-      $addFields: { month: '$_id' },
+      $addFields: { month: '$_id' }, //creates a new field called 'month' with the value of the "_id" field in the group stage above which would be the number of months created
     },
     //
     {
       $project: {
-        _id: 0,
+        _id: 0, //removes the _id field
       },
     },
     {

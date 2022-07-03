@@ -3,6 +3,7 @@
 const User = require('../models/userSchema');
 const catchAsync = require('../utilties/catchAsync');
 const AppError = require('../utilties/appError');
+const factory = require('../controllers/handlerFactory');
 
 const filterObj = (userUpdateObject, ...allowedFields) => {
   const newObject = {};
@@ -16,18 +17,26 @@ const filterObj = (userUpdateObject, ...allowedFields) => {
 };
 
 //USERS CALLBACKS
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
 
-  res.status(200).json({
-    status: 'success',
-    reults: users.length,
-    // requestTime: req.requestTime,
-    data: {
-      users,
-    },
-  });
-});
+exports.getAllUsers = factory.getAll(User);
+
+// exports.getAllUsers = catchAsync(async (req, res, next) => {
+//   const users = await User.find();
+
+//   res.status(200).json({
+//     status: 'success',
+//     reults: users.length,
+//     // requestTime: req.requestTime,
+//     data: {
+//       users,
+//     },
+//   });
+// });
+
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   //1) create error if user tries to update password with this route
@@ -63,24 +72,10 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'This route is not yet implemented',
+    message: 'This route is not yet implemented .Use /signup',
   });
 };
-exports.getSingleUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet implemented',
-  });
-};
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet implemented',
-  });
-};
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet implemented',
-  });
-};
+exports.getSingleUser = factory.getOne(User);
+exports.updateUser = factory.updateOne(User);
+
+exports.deleteUser = factory.deleteOne(User);

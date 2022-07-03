@@ -61,10 +61,10 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-//changing the passwordChangedAt property when password is update
+//changing the passwordChangedAt property when password is updated
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) {
-    //if password has not been touched skip this middleware
+    //if password has not been touched or the document is a new one skip this middleware
     return next();
   }
 

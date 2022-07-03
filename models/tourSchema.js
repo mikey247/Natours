@@ -38,6 +38,7 @@ const tourSchema = new mongoose.Schema(
       //validators
       min: [1, 'Rating must be above 1.0'],
       max: [5, 'Rating must be below 5.0'],
+      set: (val) => Math.round(val * 10) / 10, //4.666*10---46.66---47----47/10---4.7
     },
     ratingsQuantity: {
       type: Number,
@@ -82,6 +83,35 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -89,8 +119,19 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 tourSchema.virtual('durationInWeeks').get(function () {
+  //virtual properties are fields which we an define on our schema but will not persist on our database
   return this.duration / 7;
+});
+
+//VIRTUAL POPULATE
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // field on the Review Model
+  localField: '_id', // the _id is how the parent-tour is connected to the child-review
 });
 
 //DOCUMENT MIDDLEWARE  this pre middlewares run before a specified action is executed...in this case  the save,create actions etc
@@ -123,6 +164,15 @@ tourSchema.pre(/^find/, function (next) {
 tourSchema.post(/^find/, function (docs, next) {
   // console.log(docs);
   console.log(`Query took ${Date.now() - this.start} milliseconds`);
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides', // populates the guides id field  with the actual information
+    select: '-__v -passwordChangedAt', //renoves the __v and passwordChangedAt fields
+  });
+
   next();
 });
 

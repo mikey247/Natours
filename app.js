@@ -8,6 +8,7 @@ const hpp = require('hpp'); //HTTP parameter pollution
 
 const tourRouter = require('./routes/tour-routes');
 const userRouter = require('./routes/user-routes');
+const reviewRouter = require('./routes/review-routes');
 
 const AppError = require('./utilties/appError');
 const globalErrorHandler = require('./controllers/error-controller');
@@ -15,7 +16,8 @@ const app = express();
 
 // 1) MIDDLEWARES
 
-//SECURITY HTTP MIDDLEWARE
+//SECURITY HTTP MIDDLEWARE  // Set security HTTP headers
+
 app.use(helmet());
 
 //LOGGER
@@ -71,6 +73,7 @@ app.use((req, res, next) => {
 // 3) ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 //HANDLING UNDEFINED ROUTES
 app.all('*', (req, res, next) => {

@@ -48,8 +48,6 @@ exports.signUp = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    passwordChangedAt: req.body.passwordChangedAt,
-    role: req.body.role,
   });
 
   createSendToken(newUser, 201, res);
@@ -200,11 +198,11 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
-  user.passwordResetToken = undefined;
+  user.passwordResetToken = undefined; //deleting the reset token
   user.passwordResetTokenExpires = undefined;
   await user.save(); //we dont turn off the validators here because we want the password and passwordConfirm values validated
 
-  //3) Update the changePasswordAt field for the user
+  //3) Update the changePasswordAt field for the user-------we do this in a document middleware in the user schema
 
   //4) Log in the user and send new JWT
   createSendToken(user, 200, res);
