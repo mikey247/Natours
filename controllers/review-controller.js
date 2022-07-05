@@ -25,6 +25,7 @@ exports.getAllReviews = factory.getAll(Review);
 // });
 
 exports.setTourUserId = (req, res, next) => {
+  //nested routes-----router.use('/:tourId/reviews', reviewRouter);
   if (!req.body.tour) {
     req.body.tour = req.params.tourId;
   }

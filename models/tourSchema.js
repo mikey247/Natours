@@ -121,6 +121,7 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
 
 tourSchema.virtual('durationInWeeks').get(function () {
   //virtual properties are fields which we an define on our schema but will not persist on our database
@@ -177,11 +178,11 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 //AGGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', function (next) {
-  //adding an extra match aggregation stage that filters out secretTours
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  // console.log(this.pipeline());
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   //adding an extra match aggregation stage that filters out secretTours
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   // console.log(this.pipeline());
+//   next();
+// });
 
 module.exports = mongoose.model('Tour', tourSchema);
