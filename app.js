@@ -12,6 +12,8 @@ const reviewRouter = require('./routes/review-routes');
 
 const AppError = require('./utilties/appError');
 const globalErrorHandler = require('./controllers/error-controller');
+const cors = require('cors');
+
 const app = express();
 
 // 1) MIDDLEWARES
@@ -41,6 +43,22 @@ app.use(mongoSanitize());
 
 //DATA SANITIZATION AGAINST XSS(CROSS SITE SCRIPTING ATTACKS)
 app.use(xss());
+
+//CORS
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  })
+);
+
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept'
+//   );
+//   next();
+// });
 
 //HTTP PARAMETER POLLUTION
 app.use(
