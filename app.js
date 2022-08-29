@@ -9,6 +9,7 @@ const hpp = require('hpp'); //HTTP parameter pollution
 const tourRouter = require('./routes/tour-routes');
 const userRouter = require('./routes/user-routes');
 const reviewRouter = require('./routes/review-routes');
+const bookingRouter = require('./routes/booking-routes');
 
 const AppError = require('./utilties/appError');
 const globalErrorHandler = require('./controllers/error-controller');
@@ -97,6 +98,7 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 //HANDLING UNDEFINED ROUTES
 app.all('*', (req, res, next) => {
