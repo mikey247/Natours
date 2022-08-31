@@ -7,4 +7,4 @@ exports.getAllBookings = factory.getAll(Booking);
 
 exports.createBooking = factory.createOne(Booking);
 
-// catchAsync(async (req, res, next) => {})
+exports.getCustomerBookings = factory.getAll(Booking);

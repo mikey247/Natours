@@ -50,6 +50,12 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.virtual('bookings', {
+  ref: 'Booking',
+  foreignField: 'user',
+  localField: '_id',
+});
+
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next(); //this prevents password from being hashed again if password was not updated
 

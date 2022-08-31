@@ -75,6 +75,10 @@ exports.getAll = (Model) =>
       filter = { tour: req.params.tourId }; //fetching reviews for a particular tour
     }
 
+    if (req.params.userId) {
+      filter = { user: req.params.userId };
+    }
+    console.log(req.query);
     const feautres = new APIFeautres(Model.find(filter), req.query)
       .filter()
       .sort()

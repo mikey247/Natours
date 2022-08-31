@@ -7,11 +7,14 @@ const authController = require('../controllers/authentication-controller');
 
 router
   .route('/')
-  .get(bookingController.getAllBookings)
+  .get(authController.restrictTo('admin'), bookingController.getAllBookings)
   .post(
     authController.protect,
     authController.restrictTo('user'),
     bookingController.createBooking
   );
 
+router
+  .route('/:userId/customer-bookings')
+  .get(bookingController.getCustomerBookings);
 module.exports = router;
